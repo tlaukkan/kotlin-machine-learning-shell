@@ -1,4 +1,4 @@
-package ml.data
+package ml.data.model
 
 data class DataSetMeta(
         var key: String = "",
@@ -9,4 +9,5 @@ data class DataSetMeta(
         var inputMinValue: Double = 0.0,
         var inputMaxValue: Double = 0.0,
         var outputMinValue: Double = 0.0,
-        var outputMaxValue: Double = 0.0)
+        var outputMaxValue: Double = 0.0
+)

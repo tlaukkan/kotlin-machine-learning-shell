@@ -1,8 +1,8 @@
 package org.bubblecloud.logi.analysis
 
+import ml.data.DATA_PATH
 import ml.data.loadDataSet
 import ml.data.loadDataSetMeta
-import ml.util.ROOT_PATH
 import ml.util.getDirectoryAbsolutePath
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
@@ -14,7 +14,7 @@ import java.awt.image.DataBufferByte
 
 private val log = LoggerFactory.getLogger("ml.visualize")
 
-var IMAGE_PATH = getDirectoryAbsolutePath("${ROOT_PATH}/images")
+var IMAGE_PATH = getDirectoryAbsolutePath("$DATA_PATH/images")
 
 /**
  * Saves dataset image to local storage.
