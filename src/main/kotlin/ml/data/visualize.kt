@@ -2,15 +2,21 @@ package org.bubblecloud.logi.analysis
 
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
+import org.slf4j.LoggerFactory
 import java.io.File
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 
+private val log = LoggerFactory.getLogger("ml.visualize")
+
 /**
  * Visualize data as images stored to given directory.
  */
-fun visualize(imageDirectory: File, dataSetIterator: DataSetIterator, maxFeatureValue: Float, maxLabelValue: Float,featureImageWidth: Int, labelImageWidth: Int) : Unit {
+fun saveDataSetImages(imageDirectoryPath: String, dataSetIterator: DataSetIterator, maxInputValue: Double, maxOutputValue: Double, featureImageWidth: Int, labelImageWidth: Int) : Unit {
+    val imageDirectory = File(imageDirectoryPath)
+    log.info("Saving images to : ${imageDirectory.path}")
+
     if (!imageDirectory.exists()) {
         imageDirectory.mkdir()
     }
@@ -28,14 +34,11 @@ fun visualize(imageDirectory: File, dataSetIterator: DataSetIterator, maxFeature
         val rowCount = features.rows()
 
         for (r in 0..rowCount - 1) {
-            features.getRow(r)
             val imageIndexLabel = imageIndex.toString().padStart(10, '0')
-            visualize(File("${imageDirectory.path}/${imageIndexLabel}F.png"),features.getRow(r), maxFeatureValue, featureImageWidth)
-            visualize(File("${imageDirectory.path}/${imageIndexLabel}L.png"),labels.getRow(r), maxLabelValue, labelImageWidth)
+            saveDataArrayImage("${imageDirectory.path}/${imageIndexLabel}_input.png", features.getRow(r), maxInputValue, featureImageWidth)
+            saveDataArrayImage("${imageDirectory.path}/${imageIndexLabel}_output.png", labels.getRow(r), maxOutputValue, labelImageWidth)
             imageIndex++
         }
-
-        imageIndex++
     }
 
 }
@@ -43,19 +46,20 @@ fun visualize(imageDirectory: File, dataSetIterator: DataSetIterator, maxFeature
 /**
  * Visualize data as image stored to given file.
  */
-fun visualize(imageFile: File, intArray: INDArray, maxValue: Float, maxWidth: Int) : Unit {
-    val height = intArray.columns() / maxWidth
+fun saveDataArrayImage(imagePath: String, dataArray: INDArray, maxValue: Double, maxWidth: Int) : Unit {
+    val imageFile = File(imagePath)
+    val height = dataArray.columns() / maxWidth
     val bufferedImage = BufferedImage(maxWidth, height, BufferedImage.TYPE_BYTE_GRAY)
     val a = (bufferedImage.raster.dataBuffer as DataBufferByte).data
-    val data = ByteArray(intArray.columns())
+    val data = ByteArray(dataArray.columns())
 
-    for (i in 0..intArray.columns() - 1) {
-        var value = intArray.getFloat(i) / maxValue
-        if (value < 0f) {
-            value = 0f
+    for (i in 0..dataArray.columns() - 1) {
+        var value = dataArray.getFloat(i) / maxValue
+        if (value < 0.0) {
+            value = 0.0
         }
-        if (value > 1.0f) {
-            value = 1.0f
+        if (value > 1.0) {
+            value = 1.0
         }
         data[i] = (255.0 * value).toByte()
     }

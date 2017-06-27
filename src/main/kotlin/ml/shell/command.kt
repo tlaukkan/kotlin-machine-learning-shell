@@ -2,6 +2,7 @@ package ml.shell
 
 import ml.data.loadDataSetMeta
 import ml.data.saveDataSet
+import ml.data.saveDataSetImages
 import org.slf4j.LoggerFactory
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator
@@ -29,4 +30,14 @@ fun viewDataSetMeta(key: String) {
     print("           row count: ${dataSetMeta.rowCount}\n")
     print("  input column count: ${dataSetMeta.inputColumnCount}\n")
     print(" output column count: ${dataSetMeta.outputColumnCount}\n")
+    print("     input min value: ${dataSetMeta.inputMinValue}\n")
+    print("     input max value: ${dataSetMeta.inputMaxValue}\n")
+    print("    output min value: ${dataSetMeta.outputMinValue}\n")
+    print("    output max value: ${dataSetMeta.outputMaxValue}\n")
+
+}
+
+fun visualizeDataSet(key: String, inputImageWidth: Int, outputImageWidth: Int) {
+    saveDataSetImages(key, inputImageWidth, outputImageWidth)
+    println("Saved data set images: $key")
 }

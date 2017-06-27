@@ -10,4 +10,4 @@ fun getDirectoryAbsolutePath(directoryPath: String) : String {
     return directory.absolutePath
 }
 
-var ROOT_PATH = getDirectoryAbsolutePath("${System.getProperty("user.home")}/kotlin-machine-learning-console")
+var ROOT_PATH = getDirectoryAbsolutePath("${System.getProperty("user.home")}/kotlin-machine-learning-shell")
