@@ -1,0 +1,44 @@
+group 'org.bubblecloud'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.1.3'
+    ext.dl4j_version = '0.8.0'
+    ext.jackson_version = '2.8.9'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+
+    compile "org.slf4j:slf4j-simple:1.7.25"
+    compile "org.slf4j:slf4j-api:1.7.25"
+
+    compile "org.datavec:datavec-api:0.8.0"
+    compile "org.deeplearning4j:deeplearning4j-core:$dl4j_version"
+    compile "org.deeplearning4j:deeplearning4j-nlp:$dl4j_version"
+    compile "org.nd4j:nd4j-native-platform:$dl4j_version"
+
+    ompile 'com.fasterxml.jackson.core:jackson-core:2.8.9'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.9'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.9'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
