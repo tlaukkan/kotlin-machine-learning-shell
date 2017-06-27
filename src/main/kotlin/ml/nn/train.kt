@@ -4,6 +4,7 @@ import ml.data.loadDataSet
 import ml.data.loadDataSetMeta
 import org.deeplearning4j.eval.Evaluation
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
+import org.deeplearning4j.optimize.listeners.PerformanceListener
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("ml.nn.train")
@@ -16,7 +17,9 @@ fun train(model: MultiLayerNetwork, trainDataSetKey: String, testDataSetKey: Str
     val mnistTrain = loadDataSet(trainDataSetKey, batchSize)
     val mnistTest = loadDataSet(testDataSetKey, batchSize)
 
-    log.info("Train begin...")
+    model.setListeners(PerformanceListener(10))
+
+    log.info("Training begin... ($epochCount epochs * ${mnistTrainMeta.rowCount / batchSize} iterations)")
     for (i in 0..epochCount - 1) {
         log.info("Epoch $i begin...")
         model.fit(mnistTrain)

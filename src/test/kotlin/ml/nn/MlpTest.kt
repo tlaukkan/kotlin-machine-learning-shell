@@ -26,7 +26,7 @@ internal class MlpTest {
 
         // Use multi layer perceptron.
         val model = mlp(inputCount, hiddenNeuronCount, outputCount, learningRate)
-        train(model, "mnist.train", "mnist.test", 1000, epochCount)
+        train(model, "mnist.train", "mnist.test", batchSize, epochCount)
     }
 
 }
