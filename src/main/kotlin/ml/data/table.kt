@@ -1,3 +1,4 @@
+import javafx.scene.control.Tab
 import ml.data.DATA_PATH
 import ml.data.DATASET_PATH
 import ml.data.loadDataSetMeta
@@ -28,8 +29,12 @@ fun splitDataSet(sourceDataSetKey: String, targetInputTableKey: String, targetOu
     val sourceDirectoryPath = "$DATASET_PATH/$sourceDataSetKey"
     val targetInputDirectoryPath = "$TABLE_PATH/$targetInputTableKey"
     val targetOutputDirectoryPath = "$TABLE_PATH/$targetOutputTableKey"
-    splitCsv(sourceDirectoryPath,targetInputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
-    splitCsv(sourceDirectoryPath,targetOutputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
+    val targetInputTableMeta = splitCsv(sourceDirectoryPath,targetInputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
+    val targetOutputTableMeta = splitCsv(sourceDirectoryPath,targetOutputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
+    val mapper = ObjectMapper()
+    FileUtils.write(File("$targetInputDirectoryPath.json"), mapper.writeValueAsString(targetInputTableMeta), false)
+    FileUtils.write(File("$targetOutputDirectoryPath.json"), mapper.writeValueAsString(targetOutputTableMeta), false)
+
 }
 
 fun formDataSet(sourceInputTableKey: String, sourceOutputTableKey: String, targetDataSetKey: String) {
@@ -57,7 +62,7 @@ fun formDataSet(sourceInputTableKey: String, sourceOutputTableKey: String, targe
     FileUtils.write(File(targetDataSetMetaFilePath), mapper.writeValueAsString(targetDataSetMeta), false)
 }
 
-fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targetDirectoryPath: String) {
+fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targetDirectoryPath: String) : TableMeta {
     val sourceOneDirectory = File(sourceOneDirectoryPath)
     val sourceTwoDirectory = File(sourceTwoDirectoryPath)
     val targetDirectory = File(targetDirectoryPath)
@@ -71,7 +76,13 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
     var targetBatchSize = 1000
     var targetFileIndex = 0
     var targetLineIndex = 0
+
+    var targetColumnCount = 0
+    var targetLineCount = 0
+
     var targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+    var minValue = Double.MAX_VALUE
+    var maxValue = Double.MIN_VALUE
 
     val sourceOneFiles = sourceOneDirectory.listFiles()
     val sourceTwoFiles = sourceTwoDirectory.listFiles()
@@ -100,6 +111,20 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
                 targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
             }
 
+            val lineOneValues = lineOne.split(',')
+            for (value in lineOneValues) {
+                val doubleValue = value.toDouble()
+                minValue = Math.min(doubleValue, minValue)
+                maxValue = Math.max(doubleValue, maxValue)
+            }
+
+            val lineTwoValues = lineTwo.split(',')
+            for (value in lineTwo.split(',')) {
+                val doubleValue = value.toDouble()
+                minValue = Math.min(doubleValue, minValue)
+                maxValue = Math.max(doubleValue, maxValue)
+            }
+
             val lineBuilder = StringBuilder()
 
             lineBuilder.append(lineOne)
@@ -110,14 +135,17 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
             FileUtils.write(targetFile, lineBuilder.toString(), true)
 
             targetLineIndex++
+            targetColumnCount = lineOneValues.size + lineTwoValues.size
+            targetLineCount++
         }
     }
+
+    return TableMeta(targetColumnCount, targetLineCount, minValue, maxValue)
 }
 
-fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColumnIndex: Int, endColumnIndex: Int) {
+fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColumnIndex: Int, endColumnIndex: Int) : TableMeta {
     val sourceDirectory = File(sourceDirectoryPath)
     val targetDirectory = File(targetDirectoryPath)
-    val targetMetaFilePath = "$targetDirectoryPath.json"
 
     if (targetDirectory.exists()) {
         targetDirectory.deleteRecursively()
@@ -167,9 +195,7 @@ fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColu
         }
     }
 
-    val mapper = ObjectMapper()
-    val tableMeta = TableMeta(endColumnIndex - beginColumnIndex + 1, targetLineCount, minValue, maxValue)
-    FileUtils.write(File(targetMetaFilePath), mapper.writeValueAsString(tableMeta), false)
+    return TableMeta(endColumnIndex - beginColumnIndex + 1, targetLineCount, minValue, maxValue)
 }
 
 fun getFileName(directoryPath: String, fileIndex: Int) : String {

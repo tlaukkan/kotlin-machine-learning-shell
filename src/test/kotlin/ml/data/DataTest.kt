@@ -23,13 +23,13 @@ internal class DataTest {
 
     @Test
     @Ignore
-    fun testExtractInput() {
+    fun testSplitDataSet() {
         splitDataSet("mnist.train", "mnist.train.input", "mnist.train.output")
     }
 
     @Test
     @Ignore
-    fun testJoinInputAndOutput() {
+    fun testFormDataSet() {
         formDataSet("mnist.train.input", "mnist.train.input", "mnist.train.regression")
     }
 
