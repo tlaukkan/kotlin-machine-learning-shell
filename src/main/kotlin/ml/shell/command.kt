@@ -4,6 +4,7 @@ import deleteTable
 import getTableKeys
 import ml.data.*
 import org.bubblecloud.logi.analysis.saveDataSetImages
+import org.bubblecloud.logi.analysis.saveTableImages
 import org.slf4j.LoggerFactory
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator
@@ -58,7 +59,7 @@ fun removeDataSet(key: String) {
 }
 
 /**
- * Visualizes data set as grayscale images.
+ * Visualizes data set as greyscale images.
  */
 fun visualizeDataSet(key: String, inputImageWidth: Int, outputImageWidth: Int) {
     saveDataSetImages(key, inputImageWidth, outputImageWidth)
@@ -97,4 +98,13 @@ fun listTables() {
 fun removeTable(key: String) {
     deleteTable(key)
     print("Removed table: $key")
+}
+
+
+/**
+ * Visualizes table as greyscale images.
+ */
+fun visualizeTable(key: String, imageWidth: Int) {
+    saveTableImages(key, imageWidth)
+    println("Saved table as images: $key")
 }

@@ -7,11 +7,9 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import org.nd4j.shade.jackson.databind.ObjectMapper
 
-
 private val log = LoggerFactory.getLogger("ml.data.table")
 
 var TABLE_PATH = getDirectoryAbsolutePath("$DATA_PATH/tables")
-
 
 /**
  * Gets table keys from local storage.
@@ -47,19 +45,24 @@ fun loadTableMeta(key: String) : TableMeta {
     return mapper.readValue(File(metaFilePath), TableMeta::class.java)
 }
 
+/**
+ * Splits data set to tables.
+ */
 fun splitDataSetToTables(sourceDataSetKey: String, targetInputTableKey: String, targetOutputTableKey: String) {
     val sourceDataSetMeta = loadDataSetMeta(sourceDataSetKey)
     val sourceDirectoryPath = "$DATASET_PATH/$sourceDataSetKey"
     val targetInputDirectoryPath = "$TABLE_PATH/$targetInputTableKey"
     val targetOutputDirectoryPath = "$TABLE_PATH/$targetOutputTableKey"
     val targetInputTableMeta = splitCsv(sourceDirectoryPath, targetInputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
-    val targetOutputTableMeta = splitCsv(sourceDirectoryPath, targetOutputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
+    val targetOutputTableMeta = splitCsv(sourceDirectoryPath, targetOutputDirectoryPath, sourceDataSetMeta.inputColumnCount, sourceDataSetMeta.inputColumnCount + sourceDataSetMeta.outputColumnCount - 1)
     val mapper = ObjectMapper()
     FileUtils.write(File("$targetInputDirectoryPath.json"), mapper.writeValueAsString(targetInputTableMeta), false)
     FileUtils.write(File("$targetOutputDirectoryPath.json"), mapper.writeValueAsString(targetOutputTableMeta), false)
-
 }
 
+/**
+ * Forms data set from tables.
+ */
 fun formDataSetFromTables(sourceInputTableKey: String, sourceOutputTableKey: String, targetDataSetKey: String) {
     val sourceInputDirectoryPath = "$TABLE_PATH/$sourceInputTableKey"
     val sourceOutputDirectoryPath = "$TABLE_PATH/$sourceOutputTableKey"

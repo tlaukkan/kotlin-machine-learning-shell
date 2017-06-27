@@ -1,9 +1,12 @@
 package org.bubblecloud.logi.analysis
 
+import TABLE_PATH
+import loadTableMeta
 import ml.data.DATA_PATH
 import ml.data.loadDataSet
 import ml.data.loadDataSetMeta
 import ml.util.getDirectoryAbsolutePath
+import org.apache.commons.io.FileUtils
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.slf4j.LoggerFactory
@@ -63,10 +66,10 @@ fun saveDataSetImages(imageDirectoryPath: String, dataSetIterator: DataSetIterat
 /**
  * Visualize data as image stored to given file.
  */
-fun saveDataArrayImage(imagePath: String, dataArray: INDArray, minValue: Double, maxValue: Double, maxWidth: Int) : Unit {
+fun saveDataArrayImage(imagePath: String, dataArray: INDArray, minValue: Double, maxValue: Double, imageWidth: Int) : Unit {
     val imageFile = File(imagePath)
-    val height = dataArray.columns() / maxWidth
-    val bufferedImage = BufferedImage(maxWidth, height, BufferedImage.TYPE_BYTE_GRAY)
+    val height = dataArray.columns() / imageWidth
+    val bufferedImage = BufferedImage(imageWidth, height, BufferedImage.TYPE_BYTE_GRAY)
     val a = (bufferedImage.raster.dataBuffer as DataBufferByte).data
     val data = ByteArray(dataArray.columns())
 
@@ -85,3 +88,67 @@ fun saveDataArrayImage(imagePath: String, dataArray: INDArray, minValue: Double,
     ImageIO.write(bufferedImage, "png", imageFile)
 }
 
+/**
+ * Saves table images to local storage.
+ */
+fun saveTableImages(key: String, imageWidth: Int) {
+    val tableDirectoryPath = getDirectoryAbsolutePath("$TABLE_PATH/$key")
+    val imageDirectoryPath = getDirectoryAbsolutePath("${IMAGE_PATH}/$key")
+    val tableMeta = loadTableMeta(key)
+
+    saveTableImages(tableDirectoryPath, imageDirectoryPath, tableMeta.minValue, tableMeta.maxValue, imageWidth)
+}
+
+/**
+ * Saves table images to local storage.
+ */
+fun saveTableImages(tableDirectoryPath: String, imageDirectoryPath: String, minValue: Double, maxValue: Double, imageWidth: Int) : Unit {
+    val tableDirectory = File(tableDirectoryPath)
+    val imageDirectory = File(imageDirectoryPath)
+    log.info("Saving images to : ${imageDirectory.path}")
+
+    if (!imageDirectory.exists()) {
+        imageDirectory.mkdir()
+    }
+    if (!imageDirectory.isDirectory) {
+        throw IllegalArgumentException("Given path is not imageDirectory.")
+    }
+
+    var imageIndex = 0
+    for (sourceFile in tableDirectory.listFiles()) {
+        val lines = FileUtils.readLines(sourceFile, "UTF-8")
+        for (line in lines) {
+            val imageIndexLabel = imageIndex.toString().padStart(10, '0')
+            saveLineImage("${imageDirectory.path}/${imageIndexLabel}.png", line, minValue, maxValue, imageWidth)
+            imageIndex++
+        }
+    }
+
+}
+
+/**
+ * Saves line image to local storage.
+ */
+fun saveLineImage(imagePath: String, line: String, minValue: Double, maxValue: Double, imageWidth: Int) : Unit {
+    val imageFile = File(imagePath)
+    val values = line.split(',')
+    val height = values.size / imageWidth
+    val bufferedImage = BufferedImage(imageWidth, height, BufferedImage.TYPE_BYTE_GRAY)
+    val a = (bufferedImage.raster.dataBuffer as DataBufferByte).data
+    val data = ByteArray(values.size)
+
+    for (i in 0..values.size - 1) {
+        val rawValue = values[i].toDouble()
+        var value = (rawValue -  minValue) / (maxValue - minValue)
+        if (value < 0.0) {
+            value = 0.0
+        }
+        if (value > 1.0) {
+            value = 1.0
+        }
+        data[i] = (255.0 * value).toByte()
+    }
+
+    System.arraycopy(data, 0, a, 0, data.size)
+    ImageIO.write(bufferedImage, "png", imageFile)
+}

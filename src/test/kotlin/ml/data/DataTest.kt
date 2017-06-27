@@ -3,6 +3,7 @@ package ml.data
 import formDataSetFromTables
 import ml.shell.downloadDataSetMNIST
 import ml.shell.visualizeDataSet
+import ml.shell.visualizeTable
 import org.junit.Ignore
 import org.junit.Test
 import splitDataSetToTables
@@ -36,9 +37,9 @@ internal class DataTest {
     @Test
     @Ignore
     fun testVisualize2() {
-        splitDataSetToTables("mnist.train", "mnist.train.input", "mnist.train.output")
-        formDataSetFromTables("mnist.train.input", "mnist.train.input", "mnist.train.regression")
-        visualizeDataSet("mnist.train.regression", 28, 28)
+        visualizeTable("mnist.train.output", 10)
     }
+
+
 
 }
