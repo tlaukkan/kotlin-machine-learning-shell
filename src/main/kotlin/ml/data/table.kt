@@ -23,22 +23,16 @@ fun loadTableMeta(key: String) : TableMeta {
     return mapper.readValue(File(metaFilePath), TableMeta::class.java)
 }
 
-fun splitInputTable(sourceDataSetKey: String, targetTableKey: String) {
+fun splitDataSet(sourceDataSetKey: String, targetInputTableKey: String, targetOutputTableKey: String) {
     val sourceDataSetMeta = loadDataSetMeta(sourceDataSetKey)
     val sourceDirectoryPath = "$DATASET_PATH/$sourceDataSetKey"
-    val targetDirectoryPath = "$TABLE_PATH/$targetTableKey"
-    splitCsv(sourceDirectoryPath,targetDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
+    val targetInputDirectoryPath = "$TABLE_PATH/$targetInputTableKey"
+    val targetOutputDirectoryPath = "$TABLE_PATH/$targetOutputTableKey"
+    splitCsv(sourceDirectoryPath,targetInputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
+    splitCsv(sourceDirectoryPath,targetOutputDirectoryPath, 0, sourceDataSetMeta.inputColumnCount - 1)
 }
 
-fun splitOutputTable(sourceDataSetKey: String, targetTableKey: String) {
-    val sourceDataSetMeta = loadDataSetMeta(sourceDataSetKey)
-    val sourceDirectoryPath = "$DATASET_PATH/$sourceDataSetKey"
-    val targetDirectoryPath = "$TABLE_PATH/$targetTableKey"
-    splitCsv(sourceDirectoryPath,targetDirectoryPath, sourceDataSetMeta.inputColumnCount, sourceDataSetMeta.inputColumnCount + sourceDataSetMeta.outputColumnCount - 1)
-}
-
-
-fun joinInputAndOutputTable(sourceInputTableKey: String, sourceOutputTableKey: String, targetDataSetKey: String) {
+fun formDataSet(sourceInputTableKey: String, sourceOutputTableKey: String, targetDataSetKey: String) {
     val sourceInputDirectoryPath = "$TABLE_PATH/$sourceInputTableKey"
     val sourceOutputDirectoryPath = "$TABLE_PATH/$sourceOutputTableKey"
     val targetDirectoryPath = "$DATASET_PATH/$targetDataSetKey"

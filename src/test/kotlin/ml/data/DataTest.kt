@@ -1,11 +1,11 @@
 package ml.data
 
-import joinInputAndOutputTable
-import splitInputTable
+import formDataSet
 import ml.shell.downloadDataSetMNIST
 import ml.shell.visualizeDataSet
 import org.junit.Ignore
 import org.junit.Test
+import splitDataSet
 
 internal class DataTest {
 
@@ -24,18 +24,20 @@ internal class DataTest {
     @Test
     @Ignore
     fun testExtractInput() {
-        splitInputTable("mnist.train", "mnist.train.input")
+        splitDataSet("mnist.train", "mnist.train.input", "mnist.train.output")
     }
 
     @Test
     @Ignore
     fun testJoinInputAndOutput() {
-        joinInputAndOutputTable("mnist.train.input", "mnist.train.input", "mnist.train.regression")
+        formDataSet("mnist.train.input", "mnist.train.input", "mnist.train.regression")
     }
 
     @Test
     @Ignore
     fun testVisualize2() {
+        splitDataSet("mnist.train", "mnist.train.input", "mnist.train.output")
+        formDataSet("mnist.train.input", "mnist.train.input", "mnist.train.regression")
         visualizeDataSet("mnist.train.regression", 28, 28)
     }
 
