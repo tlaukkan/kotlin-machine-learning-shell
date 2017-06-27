@@ -12,6 +12,32 @@ private val log = LoggerFactory.getLogger("ml.data.table")
 
 var TABLE_PATH = getDirectoryAbsolutePath("$DATA_PATH/tables")
 
+
+/**
+ * Gets table keys from local storage.
+ */
+fun getTableKeys(): List<String> {
+    val directory = File(TABLE_PATH)
+    val keys = mutableListOf<String>()
+    for (file in directory.listFiles()) {
+        if (file.isDirectory) {
+            keys.add(file.name)
+        }
+    }
+    return keys
+}
+
+/**
+ * Deletes table from local storage.
+ */
+fun deleteTable(key: String) {
+    val metaFilePath = "$TABLE_PATH/$key.json"
+    val directoryPath = getDirectoryAbsolutePath("$TABLE_PATH/$key")
+    File(metaFilePath).delete()
+    File(directoryPath).deleteRecursively()
+}
+
+
 /**
  * Load data set meta data from local storage.
  */

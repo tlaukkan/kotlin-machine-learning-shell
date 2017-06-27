@@ -1,5 +1,7 @@
 package ml.shell
 
+import deleteTable
+import getTableKeys
 import ml.data.*
 import org.bubblecloud.logi.analysis.saveDataSetImages
 import org.slf4j.LoggerFactory
@@ -63,11 +65,36 @@ fun visualizeDataSet(key: String, inputImageWidth: Int, outputImageWidth: Int) {
     println("Saved dataset as images: $key")
 }
 
+/**
+ * Splits data set to input and output table.
+ */
 fun splitDataSet(sourceDataSetKey: String, targetInputTableKey: String, targetOutputTableKey: String) {
     splitDataSetToTables(sourceDataSetKey, targetInputTableKey, targetOutputTableKey)
     print("Splitted $sourceDataSetKey to $targetInputTableKey and $targetOutputTableKey\n");
 }
 
+/**
+ * Forms data set from input and output table.
+ */
 fun formDataSet(sourceInputTableKey: String, sourceOutputTableKey: String, targetDataSetKey: String) {
     print("Formed $targetDataSetKey from $sourceInputTableKey and $sourceOutputTableKey\n")
+}
+
+/**
+ * Lists tables.
+ */
+fun listTables() {
+    val keys = getTableKeys()
+    print("Tables: \n")
+    for (key in keys) {
+        print("$key\n")
+    }
+}
+
+/**
+ * Removes tables.
+ */
+fun removeTable(key: String) {
+    deleteTable(key)
+    print("Removed table: $key")
 }
