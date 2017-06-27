@@ -23,7 +23,7 @@ fun saveDataSetImages(key: String, inputImageWidth: Int, outputImageWidth: Int) 
     val dataSetMeta = loadDataSetMeta(key)
     val dataSetIterator = loadDataSet(key, 1000)
 
-    saveDataSetImages(directoryPath, dataSetIterator, dataSetMeta.inputMaxValue, dataSetMeta.outputMaxValue, inputImageWidth, outputImageWidth)
+    saveDataSetImages(directoryPath, dataSetIterator, dataSetMeta.inputMinValue, dataSetMeta.inputMaxValue, dataSetMeta.outputMinValue, dataSetMeta.outputMaxValue, inputImageWidth, outputImageWidth)
 }
 
 /**

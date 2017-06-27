@@ -12,19 +12,19 @@ private val log = LoggerFactory.getLogger("ml.data.command")
 /**
  * Downloads MNIST train and test data sets.
  */
-fun downloadMNIST() {
-    print("Downloading MNIST data set.\n")
-    saveDataSet("mnist-train", MnistDataSetIterator(1000, true, 0))
-    saveDataSet("mnist-test", MnistDataSetIterator(1000, false, 0))
-    print("Downloaded MNIST data set.\n")
+fun downloadDataMNIST() {
+    print("Downloading MNIST data.\n")
+    saveDataSet("mnist.train", MnistDataSetIterator(1000, true, 0))
+    saveDataSet("mnist.test", MnistDataSetIterator(1000, false, 0))
+    print("Downloaded MNIST data.\n")
 }
 
 /**
- * Views data set meta.
+ * Describes data set.
  */
-fun viewDataSetMeta(key: String) {
+fun describeData(key: String) {
     val dataSetMeta = loadDataSetMeta(key)
-    print("Data set meta:\n")
+    print("Data description:\n")
     print("                 key: ${dataSetMeta.key}\n")
     print("        column count: ${dataSetMeta.columnCount}\n")
     print("           row count: ${dataSetMeta.rowCount}\n")
@@ -37,7 +37,7 @@ fun viewDataSetMeta(key: String) {
 
 }
 
-fun visualizeDataSet(key: String, inputImageWidth: Int, outputImageWidth: Int) {
+fun visualizeData(key: String, inputImageWidth: Int, outputImageWidth: Int) {
     saveDataSetImages(key, inputImageWidth, outputImageWidth)
-    println("Saved data set images: $key")
+    println("Saved data as images: $key")
 }

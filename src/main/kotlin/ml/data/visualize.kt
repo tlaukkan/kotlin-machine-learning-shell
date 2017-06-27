@@ -13,7 +13,7 @@ private val log = LoggerFactory.getLogger("ml.visualize")
 /**
  * Visualize data as images stored to given directory.
  */
-fun saveDataSetImages(imageDirectoryPath: String, dataSetIterator: DataSetIterator, maxInputValue: Double, maxOutputValue: Double, featureImageWidth: Int, labelImageWidth: Int) : Unit {
+fun saveDataSetImages(imageDirectoryPath: String, dataSetIterator: DataSetIterator, minInputValue: Double, maxInputValue: Double, minOutputValue: Double, maxOutputValue: Double, featureImageWidth: Int, labelImageWidth: Int) : Unit {
     val imageDirectory = File(imageDirectoryPath)
     log.info("Saving images to : ${imageDirectory.path}")
 
@@ -35,8 +35,8 @@ fun saveDataSetImages(imageDirectoryPath: String, dataSetIterator: DataSetIterat
 
         for (r in 0..rowCount - 1) {
             val imageIndexLabel = imageIndex.toString().padStart(10, '0')
-            saveDataArrayImage("${imageDirectory.path}/${imageIndexLabel}_input.png", features.getRow(r), maxInputValue, featureImageWidth)
-            saveDataArrayImage("${imageDirectory.path}/${imageIndexLabel}_output.png", labels.getRow(r), maxOutputValue, labelImageWidth)
+            saveDataArrayImage("${imageDirectory.path}/${imageIndexLabel}_input.png", features.getRow(r), minInputValue, maxInputValue, featureImageWidth)
+            saveDataArrayImage("${imageDirectory.path}/${imageIndexLabel}_output.png", labels.getRow(r), minInputValue, maxOutputValue, labelImageWidth)
             imageIndex++
         }
     }
@@ -46,7 +46,7 @@ fun saveDataSetImages(imageDirectoryPath: String, dataSetIterator: DataSetIterat
 /**
  * Visualize data as image stored to given file.
  */
-fun saveDataArrayImage(imagePath: String, dataArray: INDArray, maxValue: Double, maxWidth: Int) : Unit {
+fun saveDataArrayImage(imagePath: String, dataArray: INDArray, minValue: Double, maxValue: Double, maxWidth: Int) : Unit {
     val imageFile = File(imagePath)
     val height = dataArray.columns() / maxWidth
     val bufferedImage = BufferedImage(maxWidth, height, BufferedImage.TYPE_BYTE_GRAY)
@@ -54,7 +54,7 @@ fun saveDataArrayImage(imagePath: String, dataArray: INDArray, maxValue: Double,
     val data = ByteArray(dataArray.columns())
 
     for (i in 0..dataArray.columns() - 1) {
-        var value = dataArray.getFloat(i) / maxValue
+        var value = (dataArray.getDouble(i) -  minValue) / (maxValue - minValue)
         if (value < 0.0) {
             value = 0.0
         }
