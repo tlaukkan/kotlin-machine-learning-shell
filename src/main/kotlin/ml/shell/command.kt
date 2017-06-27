@@ -5,6 +5,7 @@ import org.bubblecloud.logi.analysis.saveDataSetImages
 import org.slf4j.LoggerFactory
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator
+import splitDataSetToTables
 
 private val log = LoggerFactory.getLogger("ml.data.command")
 
@@ -60,4 +61,13 @@ fun removeDataSet(key: String) {
 fun visualizeDataSet(key: String, inputImageWidth: Int, outputImageWidth: Int) {
     saveDataSetImages(key, inputImageWidth, outputImageWidth)
     println("Saved dataset as images: $key")
+}
+
+fun splitDataSet(sourceDataSetKey: String, targetInputTableKey: String, targetOutputTableKey: String) {
+    splitDataSetToTables(sourceDataSetKey, targetInputTableKey, targetOutputTableKey)
+    print("Splitted $sourceDataSetKey to $targetInputTableKey and $targetOutputTableKey\n");
+}
+
+fun formDataSet(sourceInputTableKey: String, sourceOutputTableKey: String, targetDataSetKey: String) {
+    print("Formed $targetDataSetKey from $sourceInputTableKey and $sourceOutputTableKey\n")
 }
