@@ -1,8 +1,35 @@
 package ml.data
 
 import ml.data.model.TableMeta
+import ml.util.getDirectoryAbsolutePath
 import org.apache.commons.io.FileUtils
 import java.io.File
+
+var CSV_PATH = getDirectoryAbsolutePath("$DATA_PATH/csvs")
+
+/**
+ * Gets CSV keys from local storage.
+ */
+fun getCsvKeys(): List<String> {
+    val directory = File(CSV_PATH)
+    val keys = mutableListOf<String>()
+    for (file in directory.listFiles()) {
+        if (file.isDirectory) {
+            keys.add(file.name)
+        }
+    }
+    return keys
+}
+
+/**
+ * Deletes CSV from local storage.
+ */
+fun deleteCsv(key: String) {
+    val metaFilePath = "$CSV_PATH/$key.json"
+    val directoryPath = getDirectoryAbsolutePath("$CSV_PATH/$key")
+    File(metaFilePath).delete()
+    File(directoryPath).deleteRecursively()
+}
 
 /**
  * Created by tlaukkan on 6/27/2017.
@@ -141,6 +168,63 @@ fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColu
     }
 
     return TableMeta(endColumnIndex - beginColumnIndex + 1, targetLineCount, minValue, maxValue)
+}
+
+fun copyCsv(sourceDirectoryPath: String, targetDirectoryPath: String) : TableMeta {
+    val sourceDirectory = File(sourceDirectoryPath)
+    val targetDirectory = File(targetDirectoryPath)
+
+    if (targetDirectory.exists()) {
+        targetDirectory.deleteRecursively()
+    }
+
+    targetDirectory.mkdir()
+
+    var targetBatchSize = 1000
+    var targetFileIndex = 0
+    var targetLineIndex = 0
+    var targetColumnCount = 0
+    var targetLineCount = 0
+    var targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+
+    var minValue = Double.MAX_VALUE
+    var maxValue = Double.MIN_VALUE
+
+    for (sourceFile in sourceDirectory.listFiles()) {
+        val lines = FileUtils.readLines(sourceFile, "UTF-8")
+        for (line in lines) {
+            val values = line.split(',')
+
+            if (targetLineIndex == targetBatchSize) {
+                targetLineIndex = 0
+                targetFileIndex++
+                targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+            }
+
+            val lineBuilder = StringBuilder()
+
+            for (v in 0..values.size - 1) {
+                val value = values[v]
+                if (lineBuilder.length > 0) {
+                    lineBuilder.append(',')
+                }
+                lineBuilder.append(value)
+                val doubleValue = value.toDouble()
+                minValue = Math.min(doubleValue, minValue)
+                maxValue = Math.max(doubleValue, maxValue)
+            }
+
+            lineBuilder.append('\n')
+
+            FileUtils.write(targetFile, lineBuilder.toString(), true)
+
+            targetLineIndex++
+            targetLineCount++
+            targetColumnCount = values.size
+        }
+    }
+
+    return TableMeta(targetColumnCount, targetLineCount, minValue, maxValue)
 }
 
 fun getFileName(directoryPath: String, fileIndex: Int) : String {

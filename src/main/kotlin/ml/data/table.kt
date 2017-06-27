@@ -46,6 +46,18 @@ fun loadTableMeta(key: String) : TableMeta {
 }
 
 /**
+ * Import CSV to table.
+ */
+fun importCsvToTable(sourceCsvKey: String, targetTableKey: String) {
+    val sourceCsvDirectoryPath = "$CSV_PATH/$sourceCsvKey"
+    val targetTableDirectoryPath = "$TABLE_PATH/$targetTableKey"
+    val targetTableMetaFilePath = "$TABLE_PATH/$targetTableKey.json"
+    val targetTableMeta = copyCsv(sourceCsvDirectoryPath, targetTableDirectoryPath)
+    val mapper = ObjectMapper()
+    FileUtils.write(File(targetTableMetaFilePath), mapper.writeValueAsString(targetTableMeta), false)
+}
+
+/**
  * Splits data set to tables.
  */
 fun splitDataSetToTables(sourceDataSetKey: String, targetInputTableKey: String, targetOutputTableKey: String) {

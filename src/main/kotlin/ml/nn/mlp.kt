@@ -11,7 +11,7 @@ import org.nd4j.linalg.activations.Activation
 import org.nd4j.linalg.lossfunctions.LossFunctions
 
 /**
- * Construct default multilayer perceptron.
+ * Construct simple multi layer perceptron.
  */
 fun mlp(inputCount: Int, hiddenNeuronCount: Int, outputCount: Int, learningRate: Double) : MultiLayerNetwork {
     val conf = NeuralNetConfiguration.Builder()

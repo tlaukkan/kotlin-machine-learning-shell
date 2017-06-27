@@ -45,3 +45,31 @@ Train multi layer perceptron:
     // Use multi layer perceptron.
     val model = mlp(inputCount, hiddenNeuronCount, outputCount, learningRate)
     train(model, "mnist.train", "mnist.test", 1000, epochCount)
+    
+## Data management
+
+Place your folder containing CSV batches under "data/csvs/"
+
+For example:
+
+* data/csvs/train.input
+* data/csvs/train.output
+* data/csvs/test.input
+* data/csvs/test.output
+
+Import CSV to table:
+
+    importCsv("data/csvs/train.input")
+    importCsv("data/csvs/train.output")
+    importCsv("data/csvs/test.input")
+    importCsv("data/csvs/test.output")
+    
+Form data sets:
+
+    formDataSet("train.input", "train.output", "train")
+    formDataSet("test.input", "test.output", "test")
+
+Visualize data set to verify correctness:
+
+    visualizeDataSet("train", <inputSampleImageWidth>, <outputSampleImageWidth>)
+    visualizeDataSet("test", <inputSampleImageWidth>, <outputSampleImageWidth>)

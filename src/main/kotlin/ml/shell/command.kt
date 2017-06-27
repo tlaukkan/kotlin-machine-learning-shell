@@ -1,7 +1,9 @@
 package ml.shell
 
 import deleteTable
+import formDataSetFromTables
 import getTableKeys
+import importCsvToTable
 import ml.data.*
 import org.bubblecloud.logi.analysis.saveDataSetImages
 import org.bubblecloud.logi.analysis.saveTableImages
@@ -78,6 +80,7 @@ fun splitDataSet(sourceDataSetKey: String, targetInputTableKey: String, targetOu
  * Forms data set from input and output table.
  */
 fun formDataSet(sourceInputTableKey: String, sourceOutputTableKey: String, targetDataSetKey: String) {
+    formDataSetFromTables(sourceInputTableKey, sourceOutputTableKey, targetDataSetKey)
     print("Formed $targetDataSetKey from $sourceInputTableKey and $sourceOutputTableKey\n")
 }
 
@@ -93,7 +96,7 @@ fun listTables() {
 }
 
 /**
- * Removes tables.
+ * Removes table.
  */
 fun removeTable(key: String) {
     deleteTable(key)
@@ -107,4 +110,31 @@ fun removeTable(key: String) {
 fun visualizeTable(key: String, imageWidth: Int) {
     saveTableImages(key, imageWidth)
     println("Saved table as images: $key")
+}
+
+/**
+ * Lists CSVs.
+ */
+fun listCvs() {
+    val keys = getCsvKeys()
+    print("CSVs: \n")
+    for (key in keys) {
+        print("$key\n")
+    }
+}
+
+/**
+ * Removes CSV.
+ */
+fun removeCSV(key: String) {
+    deleteCsv(key)
+    print("Removed CSV: $key")
+}
+
+/**
+ * Imports CSV to table.
+ */
+fun importCsv(sourceCsvKey: String, targetCsvKey: String) {
+    importCsvToTable(sourceCsvKey, targetCsvKey)
+    print("Imported CSV $sourceCsvKey to table $targetCsvKey\n")
 }
