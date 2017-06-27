@@ -3,7 +3,6 @@ package ml.data
 import ml.util.ROOT_PATH
 import ml.util.getDirectoryAbsolutePath
 import org.apache.commons.io.FileUtils
-import org.bubblecloud.logi.analysis.saveDataSetImages
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.shade.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
@@ -16,14 +15,29 @@ import org.datavec.api.records.reader.impl.csv.CSVRecordReader
 private val log = LoggerFactory.getLogger("ml.data")
 
 var DATA_PATH = getDirectoryAbsolutePath("$ROOT_PATH/data")
-var IMAGE_PATH = getDirectoryAbsolutePath("$ROOT_PATH/images")
 
-fun saveDataSetImages(key: String, inputImageWidth: Int, outputImageWidth: Int) {
-    val directoryPath = getDirectoryAbsolutePath("$IMAGE_PATH/$key")
-    val dataSetMeta = loadDataSetMeta(key)
-    val dataSetIterator = loadDataSet(key, 1000)
+/**
+ * Gets data set keys from local storage.
+ */
+fun getDataSetKeys(): List<String> {
+    val directory = File(DATA_PATH)
+    val keys = mutableListOf<String>()
+    for (file in directory.listFiles()) {
+        if (file.isDirectory) {
+            keys.add(file.name)
+        }
+    }
+    return keys
+}
 
-    saveDataSetImages(directoryPath, dataSetIterator, dataSetMeta.inputMinValue, dataSetMeta.inputMaxValue, dataSetMeta.outputMinValue, dataSetMeta.outputMaxValue, inputImageWidth, outputImageWidth)
+/**
+ * Deletes data set from local storage.
+ */
+fun deleteDataSet(key: String) {
+    val metaFilePath = "$DATA_PATH/$key.json"
+    val directoryPath = getDirectoryAbsolutePath("$DATA_PATH/$key")
+    File(metaFilePath).delete()
+    File(directoryPath).deleteRecursively()
 }
 
 /**
@@ -126,3 +140,4 @@ fun saveDataSet(key: String, dateSetIterator: DataSetIterator): Unit {
 
     log.info("Saved: " + key)
 }
+

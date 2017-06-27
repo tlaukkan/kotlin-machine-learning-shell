@@ -1,5 +1,9 @@
 package org.bubblecloud.logi.analysis
 
+import ml.data.loadDataSet
+import ml.data.loadDataSetMeta
+import ml.util.ROOT_PATH
+import ml.util.getDirectoryAbsolutePath
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.slf4j.LoggerFactory
@@ -9,6 +13,19 @@ import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 
 private val log = LoggerFactory.getLogger("ml.visualize")
+
+var IMAGE_PATH = getDirectoryAbsolutePath("${ROOT_PATH}/images")
+
+/**
+ * Saves dataset image to local storage.
+ */
+fun saveDataSetImages(key: String, inputImageWidth: Int, outputImageWidth: Int) {
+    val directoryPath = getDirectoryAbsolutePath("${IMAGE_PATH}/$key")
+    val dataSetMeta = loadDataSetMeta(key)
+    val dataSetIterator = loadDataSet(key, 1000)
+
+    saveDataSetImages(directoryPath, dataSetIterator, dataSetMeta.inputMinValue, dataSetMeta.inputMaxValue, dataSetMeta.outputMinValue, dataSetMeta.outputMaxValue, inputImageWidth, outputImageWidth)
+}
 
 /**
  * Visualize data as images stored to given directory.
@@ -67,3 +84,4 @@ fun saveDataArrayImage(imagePath: String, dataArray: INDArray, minValue: Double,
     System.arraycopy(data, 0, a, 0, data.size)
     ImageIO.write(bufferedImage, "png", imageFile)
 }
+
