@@ -80,10 +80,10 @@ For example:
 
 Import CSV to table:
 
-    importCsv("data/csvs/train.input")
-    importCsv("data/csvs/train.output")
-    importCsv("data/csvs/test.input")
-    importCsv("data/csvs/test.output")
+    importCsv("train.input")
+    importCsv("train.output")
+    importCsv("test.input")
+    importCsv("test.output")
     
 Form data sets:
 
