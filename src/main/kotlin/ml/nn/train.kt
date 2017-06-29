@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger("ml.nn.train")
 
+/**
+ * Trains model.
+ */
 fun train(model: MultiLayerNetwork, trainDataSetKey: String, testDataSetKey: String, batchSize: Int, epochCount: Int) {
 
     val startTimeMillis = System.currentTimeMillis()

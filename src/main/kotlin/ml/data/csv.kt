@@ -1,7 +1,6 @@
 package ml.data
 
 import ml.data.model.TableMeta
-import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -35,7 +34,7 @@ fun deleteCsv(key: String) {
 }
 
 /**
- * Created by tlaukkan on 6/27/2017.
+ * Join two CSV files column wise.
  */
 fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targetDirectoryPath: String) : TableMeta {
     val sourceOneDirectory = File(sourceOneDirectoryPath)
@@ -55,7 +54,7 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
     var targetColumnCount = 0
     var targetLineCount = 0
 
-    var targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
+    var targetPrinter = PrintWriter(File("${getCsvFileName(targetDirectoryPath, targetFileIndex)}"))
     var minValue = Double.MAX_VALUE
     var maxValue = Double.MIN_VALUE
 
@@ -89,7 +88,7 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
                 targetLineIndex = 0
                 targetFileIndex++
                 targetPrinter.close()
-                targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
+                targetPrinter = PrintWriter(File("${getCsvFileName(targetDirectoryPath, targetFileIndex)}"))
             }
 
             val lineOneValues = lineOne.split(',')
@@ -122,6 +121,9 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
     return TableMeta(targetColumnCount, targetLineCount, minValue, maxValue)
 }
 
+/**
+ * Split given columns from CSV file.
+ */
 fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColumnIndex: Int, endColumnIndex: Int) : TableMeta {
     val sourceDirectory = File(sourceDirectoryPath)
     val targetDirectory = File(targetDirectoryPath)
@@ -136,7 +138,7 @@ fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColu
     var targetFileIndex = 0
     var targetLineIndex = 0
     var targetLineCount = 0
-    var targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
+    var targetPrinter = PrintWriter(File("${getCsvFileName(targetDirectoryPath, targetFileIndex)}"))
 
     var minValue = Double.MAX_VALUE
     var maxValue = Double.MIN_VALUE
@@ -149,7 +151,7 @@ fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColu
                 targetLineIndex = 0
                 targetFileIndex++
                 targetPrinter.close()
-                targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
+                targetPrinter = PrintWriter(File("${getCsvFileName(targetDirectoryPath, targetFileIndex)}"))
             }
 
             for (v in beginColumnIndex..endColumnIndex) {
@@ -175,6 +177,9 @@ fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColu
     return TableMeta(endColumnIndex - beginColumnIndex + 1, targetLineCount, minValue, maxValue)
 }
 
+/**
+ * Copy CSV file.
+ */
 fun copyCsv(sourceDirectoryPath: String, targetDirectoryPath: String) : TableMeta {
     val sourceDirectory = File(sourceDirectoryPath)
     val targetDirectory = File(targetDirectoryPath)
@@ -190,7 +195,7 @@ fun copyCsv(sourceDirectoryPath: String, targetDirectoryPath: String) : TableMet
     var targetLineIndex = 0
     var targetColumnCount = 0
     var targetLineCount = 0
-    var targetWriter = File("${getFileName(targetDirectoryPath, targetFileIndex)}").printWriter()
+    var targetWriter = File("${getCsvFileName(targetDirectoryPath, targetFileIndex)}").printWriter()
 
     var minValue = Double.MAX_VALUE
     var maxValue = Double.MIN_VALUE
@@ -203,7 +208,7 @@ fun copyCsv(sourceDirectoryPath: String, targetDirectoryPath: String) : TableMet
                 targetLineIndex = 0
                 targetFileIndex++
                 targetWriter.close()
-                targetWriter = File("${getFileName(targetDirectoryPath, targetFileIndex)}").printWriter()
+                targetWriter = File("${getCsvFileName(targetDirectoryPath, targetFileIndex)}").printWriter()
             }
 
             for (v in 0..values.size - 1) {
@@ -231,6 +236,9 @@ fun copyCsv(sourceDirectoryPath: String, targetDirectoryPath: String) : TableMet
     return TableMeta(targetColumnCount, targetLineCount, minValue, maxValue)
 }
 
-fun getFileName(directoryPath: String, fileIndex: Int) : String {
+/**
+ * Gets CSF file name from parent directory path and child file index.
+ */
+private fun getCsvFileName(directoryPath: String, fileIndex: Int) : String {
     return "$directoryPath/${fileIndex.toString().padStart(4, '0')}.csv"
 }
