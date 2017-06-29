@@ -6,7 +6,7 @@ import getTableKeys
 import importCsvToTable
 import ml.data.*
 import org.bubblecloud.logi.analysis.saveDataSetImages
-import org.bubblecloud.logi.analysis.saveTableImages
+import org.bubblecloud.logi.analysis.saveTableAsImages
 import org.slf4j.LoggerFactory
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator
@@ -108,7 +108,7 @@ fun removeTable(key: String) {
  * Visualizes table as greyscale images.
  */
 fun visualizeTable(key: String, imageWidth: Int) {
-    saveTableImages(key, imageWidth)
+    saveTableAsImages(key, imageWidth)
     println("Saved table as images: $key")
 }
 

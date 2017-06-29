@@ -1,7 +1,7 @@
 import ml.data.*
 import ml.data.model.DataSetMeta
 import ml.data.model.TableMeta
-import ml.util.getDirectoryAbsolutePath
+import ml.data.getDirectoryAbsolutePath
 import org.slf4j.LoggerFactory
 import java.io.File
 import org.apache.commons.io.FileUtils

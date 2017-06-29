@@ -5,7 +5,7 @@ import loadTableMeta
 import ml.data.DATA_PATH
 import ml.data.loadDataSet
 import ml.data.loadDataSetMeta
-import ml.util.getDirectoryAbsolutePath
+import ml.data.getDirectoryAbsolutePath
 import org.apache.commons.io.FileUtils
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
@@ -91,18 +91,18 @@ fun saveDataArrayImage(imagePath: String, dataArray: INDArray, minValue: Double,
 /**
  * Saves table images to local storage.
  */
-fun saveTableImages(key: String, imageWidth: Int) {
+fun saveTableAsImages(key: String, imageWidth: Int) {
     val tableDirectoryPath = getDirectoryAbsolutePath("$TABLE_PATH/$key")
     val imageDirectoryPath = getDirectoryAbsolutePath("${IMAGE_PATH}/$key")
     val tableMeta = loadTableMeta(key)
 
-    saveTableImages(tableDirectoryPath, imageDirectoryPath, tableMeta.minValue, tableMeta.maxValue, imageWidth)
+    saveTableAsImages(tableDirectoryPath, imageDirectoryPath, tableMeta.minValue, tableMeta.maxValue, imageWidth)
 }
 
 /**
  * Saves table images to local storage.
  */
-fun saveTableImages(tableDirectoryPath: String, imageDirectoryPath: String, minValue: Double, maxValue: Double, imageWidth: Int) : Unit {
+fun saveTableAsImages(tableDirectoryPath: String, imageDirectoryPath: String, minValue: Double, maxValue: Double, imageWidth: Int) : Unit {
     val tableDirectory = File(tableDirectoryPath)
     val imageDirectory = File(imageDirectoryPath)
     log.info("Saving images to : ${imageDirectory.path}")

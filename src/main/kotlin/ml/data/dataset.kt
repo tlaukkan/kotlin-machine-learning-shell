@@ -1,7 +1,6 @@
 package ml.data
 
 import ml.data.model.DataSetMeta
-import ml.util.getDirectoryAbsolutePath
 import org.apache.commons.io.FileUtils
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.shade.jackson.databind.ObjectMapper

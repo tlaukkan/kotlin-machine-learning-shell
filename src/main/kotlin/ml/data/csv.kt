@@ -1,9 +1,12 @@
 package ml.data
 
 import ml.data.model.TableMeta
-import ml.util.getDirectoryAbsolutePath
 import org.apache.commons.io.FileUtils
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
+import java.io.PrintWriter
+import java.lang.IndexOutOfBoundsException
 
 var CSV_PATH = getDirectoryAbsolutePath("$DATA_PATH/csvs")
 
@@ -52,7 +55,7 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
     var targetColumnCount = 0
     var targetLineCount = 0
 
-    var targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+    var targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
     var minValue = Double.MAX_VALUE
     var maxValue = Double.MIN_VALUE
 
@@ -66,21 +69,27 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
     for (f in 0..sourceOneFiles.size - 1) {
         val sourceOneFile = sourceOneFiles[f]
         val sourceTwoFile = sourceTwoFiles[f]
-        val sourceOneLines = FileUtils.readLines(sourceOneFile, "UTF-8")
-        val sourceTwoLines = FileUtils.readLines(sourceTwoFile, "UTF-8")
+        val sourceOneReader = BufferedReader(FileReader(sourceOneFile))
+        val sourceTwoReader = BufferedReader(FileReader(sourceTwoFile))
 
-        if (sourceOneLines.size != sourceTwoLines.size) {
-            throw IllegalArgumentException("Source files do not have same amount of lines.")
-        }
-
-        for (l in 0..sourceOneLines.size - 1) {
-            val lineOne = sourceOneLines[l]
-            val lineTwo = sourceTwoLines[l]
+        while (true) {
+            val lineOne = sourceOneReader.readLine()
+            val lineTwo = sourceTwoReader.readLine()
+            if (lineOne == null && lineTwo != null) {
+                throw IndexOutOfBoundsException("Input files do not have equal number of lines.")
+            }
+            if (lineOne != null && lineTwo == null) {
+                throw IndexOutOfBoundsException("Input files do not have equal number of lines.")
+            }
+            if (lineOne == null && lineTwo == null) {
+                break
+            }
 
             if (targetLineIndex == targetBatchSize) {
                 targetLineIndex = 0
                 targetFileIndex++
-                targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+                targetPrinter.close()
+                targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
             }
 
             val lineOneValues = lineOne.split(',')
@@ -97,20 +106,18 @@ fun joinCsv(sourceOneDirectoryPath: String, sourceTwoDirectoryPath: String, targ
                 maxValue = Math.max(doubleValue, maxValue)
             }
 
-            val lineBuilder = StringBuilder()
-
-            lineBuilder.append(lineOne)
-            lineBuilder.append(',')
-            lineBuilder.append(lineTwo)
-            lineBuilder.append('\n')
-
-            FileUtils.write(targetFile, lineBuilder.toString(), true)
+            targetPrinter.print(lineOne)
+            targetPrinter.print(',')
+            targetPrinter.print(lineTwo)
+            targetPrinter.println()
 
             targetLineIndex++
             targetColumnCount = lineOneValues.size + lineTwoValues.size
             targetLineCount++
         }
     }
+
+    targetPrinter.close()
 
     return TableMeta(targetColumnCount, targetLineCount, minValue, maxValue)
 }
@@ -129,43 +136,41 @@ fun splitCsv(sourceDirectoryPath: String, targetDirectoryPath: String, beginColu
     var targetFileIndex = 0
     var targetLineIndex = 0
     var targetLineCount = 0
-    var targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+    var targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
 
     var minValue = Double.MAX_VALUE
     var maxValue = Double.MIN_VALUE
 
     for (sourceFile in sourceDirectory.listFiles()) {
-        val lines = FileUtils.readLines(sourceFile, "UTF-8")
-        for (line in lines) {
+        sourceFile.forEachLine { line ->
             val values = line.split(',')
 
             if (targetLineIndex == targetBatchSize) {
                 targetLineIndex = 0
                 targetFileIndex++
-                targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+                targetPrinter.close()
+                targetPrinter = PrintWriter(File("${getFileName(targetDirectoryPath, targetFileIndex)}"))
             }
-
-            val lineBuilder = StringBuilder()
 
             for (v in beginColumnIndex..endColumnIndex) {
                 val value = values[v]
-                if (lineBuilder.length > 0) {
-                    lineBuilder.append(',')
+                if (v > beginColumnIndex) {
+                    targetPrinter.print(',')
                 }
-                lineBuilder.append(value)
+                targetPrinter.print(value)
                 val doubleValue = value.toDouble()
                 minValue = Math.min(doubleValue, minValue)
                 maxValue = Math.max(doubleValue, maxValue)
             }
 
-            lineBuilder.append('\n')
-
-            FileUtils.write(targetFile, lineBuilder.toString(), true)
+            targetPrinter.println()
 
             targetLineIndex++
             targetLineCount++
         }
     }
+
+    targetPrinter.close()
 
     return TableMeta(endColumnIndex - beginColumnIndex + 1, targetLineCount, minValue, maxValue)
 }
@@ -185,44 +190,43 @@ fun copyCsv(sourceDirectoryPath: String, targetDirectoryPath: String) : TableMet
     var targetLineIndex = 0
     var targetColumnCount = 0
     var targetLineCount = 0
-    var targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+    var targetWriter = File("${getFileName(targetDirectoryPath, targetFileIndex)}").printWriter()
 
     var minValue = Double.MAX_VALUE
     var maxValue = Double.MIN_VALUE
 
     for (sourceFile in sourceDirectory.listFiles()) {
-        val lines = FileUtils.readLines(sourceFile, "UTF-8")
-        for (line in lines) {
+        sourceFile.forEachLine { line ->
             val values = line.split(',')
 
             if (targetLineIndex == targetBatchSize) {
                 targetLineIndex = 0
                 targetFileIndex++
-                targetFile = File("${getFileName(targetDirectoryPath, targetFileIndex)}")
+                targetWriter.close()
+                targetWriter = File("${getFileName(targetDirectoryPath, targetFileIndex)}").printWriter()
             }
-
-            val lineBuilder = StringBuilder()
 
             for (v in 0..values.size - 1) {
                 val value = values[v]
-                if (lineBuilder.length > 0) {
-                    lineBuilder.append(',')
+                if (v > 0) {
+                    targetWriter.print(',')
                 }
-                lineBuilder.append(value)
+                targetWriter.print(value)
                 val doubleValue = value.toDouble()
                 minValue = Math.min(doubleValue, minValue)
                 maxValue = Math.max(doubleValue, maxValue)
             }
 
-            lineBuilder.append('\n')
-
-            FileUtils.write(targetFile, lineBuilder.toString(), true)
+            targetWriter.println()
 
             targetLineIndex++
             targetLineCount++
             targetColumnCount = values.size
+
         }
     }
+
+    targetWriter.close()
 
     return TableMeta(targetColumnCount, targetLineCount, minValue, maxValue)
 }
